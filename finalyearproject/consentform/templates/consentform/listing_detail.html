@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ listing.title }} - Campus Marketplace{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Left Column: Image Gallery & Details -->
+    <div class="col-lg-8 mb-4">
+        <div class="card border-0 shadow-sm p-3 mb-4">
+            <!-- Main Image Carousel -->
+            {% if listing.images.all %}
+                <div id="listingCarousel" class="carousel slide bg-dark rounded mb-3" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for img in listing.images.all %}
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <img src="{{ img.image.url }}" class="d-block w-100 object-fit-contain" style="height: 380px;" alt="{{ listing.title }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if listing.images.count > 1 %}
+                        <button class="carousel-control-prev" type="button" data-bs-target="#listingCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#listingCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </button>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h1 class="h3 mb-0">{{ listing.title }}</h1>
+                <h3 class="text-success fw-bold mb-0">${{ listing.price }}</h3>
+            </div>
+
+            <div class="mb-3">
+                <span class="badge bg-primary">{{ listing.category.name|default:"Uncategorized" }}</span>
+                <span class="badge bg-secondary">{{ listing.get_listing_type_display }}</span>
+                <span class="badge bg-info text-dark">Condition: {{ listing.get_condition_display }}</span>
+            </div>
+
+            <hr>
+
+            <h5 class="h6 text-uppercase text-muted">Description</h5>
+            <p style="white-space: pre-line;">{{ listing.description }}</p>
+
+            <div class="text-muted small border-top pt-2 mt-3">
+                Posted on {{ listing.created_at|date:"F j, Y" }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Seller Info & Inquiry Form -->
+    <div class="col-lg-4">
+        <!-- Seller Info Card -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title h6">Seller Profile</h5>
+                <div class="d-flex align-items-center gap-3 my-3">
+                    {% if listing.owner.profile.avatar %}
+                        <img src="{{ listing.owner.profile.avatar.url }}" class="rounded-circle object-fit-cover" width="50" height="50" alt="Avatar">
+                    {% endif %}
+                    <div>
+                        <h6 class="mb-0">{{ listing.owner.username }}</h6>
+                        <small class="text-muted">{{ listing.owner.profile.campus_location|default:"Campus Resident" }}</small>
+                    </div>
+                </div>
+
+                <!-- Edit/Delete options for owner -->
+                {% if request.user == listing.owner %}
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'listing_update' listing.pk %}" class="btn btn-warning btn-sm">Edit Listing</a>
+                        <a href="{% url 'listing_delete' listing.pk %}" class="btn btn-danger btn-sm">Delete Listing</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Inquiry Contact Form -->
+        {% if request.user != listing.owner %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title h6 mb-3">Send Inquiry to Seller</h5>
+                    
+                    {% if user.is_authenticated %}
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label small">Your Message</label>
+                                <textarea name="message" class="form-control" rows="3" required placeholder="Hi, is this item still available?"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small">Your Contact Email</label>
+                                <input type="email" name="contact_email" class="form-control" value="{{ user.email }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small">Phone / WhatsApp (Optional)</label>
+                                <input type="text" name="contact_phone" class="form-control" value="{{ user.profile.phone_number|default:'' }}">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Send Message</button>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-secondary text-center mb-0">
+                            Please <a href="{% url 'login' %}">login</a> to contact the seller.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

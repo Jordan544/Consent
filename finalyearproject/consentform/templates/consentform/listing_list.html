@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard - Campus Marketplace{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center bg-white p-4 rounded shadow-sm">
+            <div>
+                <h2 class="h4 mb-1">Inquiry Dashboard</h2>
+                <p class="text-muted mb-0">Manage messages sent and received for campus items & services.</p>
+            </div>
+            {% if unread_count > 0 %}
+                <span class="badge bg-danger fs-6 p-2">
+                    <i class="bi bi-bell-fill"></i> {{ unread_count }} Unread Received
+                </span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Tabs Navigation -->
+<ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active fw-semibold" id="received-tab" data-bs-toggle="tab" data-bs-target="#received" type="button" role="tab">
+            Received Inquiries ({{ received_inquiries|length }})
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link fw-semibold" id="sent-tab" data-bs-toggle="tab" data-bs-target="#sent" type="button" role="tab">
+            Sent Inquiries ({{ sent_inquiries|length }})
+        </button>
+    </li>
+</ul>
+
+<!-- Tab Contents -->
+<div class="tab-content" id="dashboardTabsContent">
+    
+    <!-- 1. RECEIVED INQUIRIES TAB -->
+    <div class="tab-pane fade show active" id="received" role="tabpanel">
+        {% if received_inquiries %}
+            <div class="row g-3">
+                {% for inquiry in received_inquiries %}
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm {% if not inquiry.is_read %}border-start border-primary border-4{% endif %}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title mb-1">
+                                            Listing: <a href="{% url 'listing_detail' inquiry.listing.pk %}">{{ inquiry.listing.title }}</a>
+                                        </h5>
+                                        <p class="text-muted small mb-2">
+                                            From <strong>{{ inquiry.sender.username }}</strong> on {{ inquiry.created_at|date:"M d, Y - H:i" }}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        {% if not inquiry.is_read %}
+                                            <span class="badge bg-primary me-2">New</span>
+                                        {% endif %}
+                                        <a href="{% url 'toggle_inquiry_read' inquiry.pk %}" class="btn btn-sm btn-outline-secondary">
+                                            {% if inquiry.is_read %}Mark Unread{% else %}Mark Read{% endif %}
+                                        </a>
+                                        <a href="{% url 'delete_inquiry' inquiry.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this inquiry?');">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <hr class="my-2">
+                                <p class="card-text text-dark">{{ inquiry.message }}</p>
+                                <div class="bg-light p-2 rounded small text-muted">
+                                    <strong>Contact Info:</strong> Email: {{ inquiry.contact_email }}
+                                    {% if inquiry.contact_phone %} | Phone: {{ inquiry.contact_phone }}{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">You haven't received any inquiries yet.</div>
+        {% endif %}
+    </div>
+
+    <!-- 2. SENT INQUIRIES TAB -->
+    <div class="tab-pane fade" id="sent" role="tabpanel">
+        {% if sent_inquiries %}
+            <div class="row g-3">
+                {% for inquiry in sent_inquiries %}
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title mb-1">
+                                            Listing: <a href="{% url 'listing_detail' inquiry.listing.pk %}">{{ inquiry.listing.title }}</a>
+                                        </h5>
+                                        <p class="text-muted small mb-2">
+                                            To Owner <strong>{{ inquiry.receiver.username }}</strong> on {{ inquiry.created_at|date:"M d, Y - H:i" }}
+                                        </p>
+                                    </div>
+                                    <a href="{% url 'delete_inquiry' inquiry.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this inquiry?');">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                                <hr class="my-2">
+                                <p class="card-text text-dark">{{ inquiry.message }}</p>
+                                <div class="bg-light p-2 rounded small text-muted">
+                                    <strong>You Provided:</strong> Email: {{ inquiry.contact_email }}
+                                    {% if inquiry.contact_phone %} | Phone: {{ inquiry.contact_phone }}{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">You haven't sent any inquiries yet.</div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

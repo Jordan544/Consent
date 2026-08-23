@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - Campus Marketplace{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card border-0 shadow-sm p-4">
+            <h3 class="h4 mb-3">Edit Profile & Contact Info</h3>
+            <hr class="mb-4">
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Account Information -->
+                <h5 class="h6 text-primary fw-bold mb-3">1. Account Details</h5>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label small">First Name</label>
+                        <input type="text" name="first_name" class="form-control" value="{{ u_form.first_name.value|default:'' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small">Last Name</label>
+                        <input type="text" name="last_name" class="form-control" value="{{ u_form.last_name.value|default:'' }}">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small">Email Address</label>
+                    <input type="email" name="email" class="form-control" value="{{ u_form.email.value|default:'' }}" required>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Campus & Public Contact Info -->
+                <h5 class="h6 text-primary fw-bold mb-3">2. Campus Profile & Contact</h5>
+                
+                <div class="mb-3 d-flex align-items-center gap-3">
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" class="rounded-circle object-fit-cover" width="60" height="60" alt="Profile Picture">
+                    {% endif %}
+                    <div class="flex-grow-1">
+                        <label class="form-label small">Profile Picture</label>
+                        <input type="file" name="avatar" class="form-control form-control-sm">
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label small">Phone / WhatsApp Number</label>
+                        <input type="text" name="phone_number" class="form-control" value="{{ p_form.phone_number.value|default:'' }}" placeholder="+123456789">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small">Campus Location</label>
+                        <input type="text" name="campus_location" class="form-control" value="{{ p_form.campus_location.value|default:'' }}" placeholder="e.g. Block B, West Hostel">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small">Bio</label>
+                    <textarea name="bio" class="form-control" rows="3" placeholder="Tell other students a bit about what you do or buy/sell...">{{ p_form.bio.value|default:'' }}</textarea>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

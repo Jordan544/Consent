@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up - Campus Marketplace{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm p-4">
+            <h3 class="h4 text-center mb-3">Create Student Account</h3>
+            <p class="text-muted text-center small mb-4">Join the campus community to list items and connect with students.</p>
+
+            <form method="POST">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">{{ field.label }}</label>
+                        <input type="{{ field.field.widget.input_type|default:'text' }}" 
+                               name="{{ field.name }}" 
+                               class="form-control {% if field.errors %}is-invalid{% endif %}"
+                               {% if field.field.required %}required{% endif %}>
+                        
+                        {% if field.help_text %}
+                            <div class="form-text text-muted extra-small">{{ field.help_text }}</div>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn btn-primary w-100 fw-semibold mt-2">Create Account</button>
+            </form>
+
+            <hr class="my-4">
+            <div class="text-center small">
+                Already registered? <a href="{% url 'login' %}">Sign in here</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

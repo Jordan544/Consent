@@ -129,3 +129,6 @@ MAILERS = {
 STATICFILES_URL = (
     os.path.join(BASE_DIR, 'static')
 )
+LOGIN_REDIRECT_URL = 'listing_list'
+LOGOUT_REDIRECT_URL = 'listing_list'
+LOGIN_URL = 'login'
