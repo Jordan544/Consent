@@ -10,7 +10,7 @@ services:
     runtime: python
     plan: free
     buildCommand: "./build.sh"
-    startCommand: "gunicorn finalyearproject.wsgi:application"
+    startCommand: "cd finalyearproject && gunicorn finalyearproject.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.4
