@@ -20,12 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&%$3xcz(%vw$x)5(0taa1_96==)mlpm7uy!3u%bz6zp3sp4t_#'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-&%$3xcz(%vw$x)5(0taa1_96==)mlpm7uy!3u%bz6zp3sp4t_#')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -74,10 +74,13 @@ WSGI_APPLICATION = 'finalyearproject.wsgi.application'
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL', f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
+    )
 }
 
 
@@ -116,6 +119,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 # Email
@@ -126,9 +130,9 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
-STATICFILES_URL = (
-    os.path.join(BASE_DIR, 'static')
-)
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 LOGIN_REDIRECT_URL = 'listing_list'
 LOGOUT_REDIRECT_URL = 'listing_list'
 LOGIN_URL = 'login'
