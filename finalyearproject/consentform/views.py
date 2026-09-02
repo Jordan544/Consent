@@ -147,26 +147,6 @@ def listing_delete(request, pk):
   return render(request, 'consentform/listing_delete.html', context)
 
 @login_required
-def dashboard(request):
-  received_inquiries = Inquiry.objects.filter(
-    reciever=request.user
-  ).select_related('listing', 'sender')
-
-  sent_inquiries = Inquiry.objects.filter(
-    sender=request.user
-  ).select_related('listing', 'receiver')
-
-  #for counting unread but received messages
-  unread_count = received_inquiries.filter(is_read=False).count()
-
-  context = {
-    'received_inquiries': received_inquiries,
-    'sent_inquiries': sent_inquiries,
-    'unread_count': unread_count,
-  }
-  return render(request, 'consentform/dashboard.html', context)
-
-@login_required
 def toggle_inquiry_read(request, pk):
   inquiry = get_object_or_404(Inquiry, pk=pk, receiver=request.user)
 
@@ -209,7 +189,7 @@ def signup_view(request):
 
 @login_required
 def profile_edit(request):
-  created = Profile.objects.get_or_create(user=request.user)
+  profile, created = Profile.objects.get_or_create(user=request.user)
 
   if request.method == 'POST':
       u_form = UserUpdateForm(request.POST, instance=request.user)
@@ -222,10 +202,30 @@ def profile_edit(request):
           return redirect('dashboard')
   else:
       u_form = UserUpdateForm(instance=request.user)
-      p_form = ProfileUpdateForm(instance=request.user.profile)
+      p_form = ProfileUpdateForm(instance=profile) # Using 'profile' here
 
   context = {
       'u_form': u_form,
       'p_form': p_form,
   }
   return render(request, 'consentform/profile_edit.html', context)
+
+
+@login_required
+def dashboard(request):
+  received_inquiries = Inquiry.objects.filter(
+    receiver=request.user  # Fixed typo from 'reciever' to 'receiver'
+  ).select_related('listing', 'sender')
+
+  sent_inquiries = Inquiry.objects.filter(
+    sender=request.user
+  ).select_related('listing', 'receiver')
+
+  unread_count = received_inquiries.filter(is_read=False).count()
+
+  context = {
+    'received_inquiries': received_inquiries,
+    'sent_inquiries': sent_inquiries,
+    'unread_count': unread_count,
+  }
+  return render(request, 'consentform/dashboard.html', context)

@@ -8,7 +8,7 @@ class Profile(models.Model):
     avatar = models.ImageField(upload_to="profiles/", default="profiles/default.png", blank=True)
     bio = models.TextField(max_length=500, blank=True)
     phone_number = models.CharField(max_length=20, blank=True)
-    age = models.PositiveIntegerField(validators=[MinValueValidator(18), MaxValueValidator(100)])
+    age = models.PositiveIntegerField(validators=[MinValueValidator(18), MaxValueValidator(100)], null=True, blank=True )
     gender = models.CharField(max_length=10)
     location = models.CharField(max_length=100, blank=True, help_text="e.g. Hostels, Eastern Campus")
 
