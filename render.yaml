@@ -1,6 +1,6 @@
 databases:
   - name: marketplace_db
-    database_name: marketplace
+    databaseName: marketplace
     user: marketplace_user
     plan: free
 
